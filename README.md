@@ -1,8 +1,6 @@
 # SALS Security Team — Incident Statement & Incident Report Registry (OEF-23)
 
-Centralized incident statement reporting, registry management, and verification workspace designed for the SALS Security Team. Built to run seamlessly across both Cloudflare Workers (with Cloudflare D1 distributed storage) and standalone Node.js runtimes (with native SQLite).
-
-**Developed with Google AI Studio.**
+Centralized incident statement reporting, registry management, and verification workspace designed for the SALS Security Team. Runs as a standalone Node.js server powered by Google AI Studio.
 
 ---
 
@@ -58,32 +56,25 @@ Centralized incident statement reporting, registry management, and verification 
 
 ---
 
-## Dual Deployment & Runtime Environments
+## Running with Google AI Studio
 
-### A. Cloudflare Workers & D1 (Production Edge)
-The application is configured as a Cloudflare Worker using Wrangler with static asset bindings:
-- **Worker Configuration:** `wrangler.jsonc` declaring Worker `oef-23`, asset directory `./public`, and D1 database binding `DB` (`oef-23-reports`).
-- **Worker Entry Point:** `src/worker.mjs` serving `/api/*` endpoints and passing static assets through `env.ASSETS`.
-- **Automatic Schema Initialization:** Database tables (`reports`, `users`, `sessions`, `login_limits`) are provisioned automatically on the first API request.
-- **Deploy Command:**
-  ```bash
-  npm run deploy
-  # or
-  npx wrangler deploy
-  ```
+The application runs as a standalone Node.js server with Google AI Studio as the hosting environment:
 
-### B. Standalone Node.js Runtime (Development / Cloud Run)
-The application includes a self-contained Node.js HTTP server:
 - **Server Entry Point:** `server.mjs` running on `PORT 3000` (`0.0.0.0`).
-- **Native SQLite:** Powered by Node.js built-in `node:sqlite` (`DatabaseSync`), adapting queries to match Cloudflare D1's Promise-based API.
+- **Native SQLite:** Powered by Node.js built-in `node:sqlite` (`DatabaseSync`).
+- **Automatic Schema Initialization:** Database tables (`reports`, `users`, `sessions`, `login_limits`) are provisioned automatically on the first API request.
 - **Graceful Shutdown:** Tracks in-flight requests and drains them on `SIGTERM`/`SIGINT` with a 30-second timeout.
-- **Development & Start Commands:**
-  ```bash
-  # Start local development server
-  npm start
-  # or
-  npm run dev
-  ```
+
+### Start Commands
+```bash
+# Install dependencies
+npm install
+
+# Start the server (development)
+npm start
+# or
+npm run dev
+```
 
 ---
 
