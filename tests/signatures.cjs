@@ -1,0 +1,12 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const html=fs.readFileSync(require('path').join(__dirname,'../public/index.html'),'utf8');
+assert(!html.includes('<canvas'));
+const ctx={window:{addEventListener(){}}};vm.createContext(ctx);
+vm.runInContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],ctx);
+vm.runInContext("restoreSig('sigOfficer','data:image/png;base64,YQ==')",ctx);
+assert.equal(vm.runInContext("getSigData('sigOfficer')",ctx),'data:image/png;base64,YQ==');
+vm.runInContext("clearSig('sigOfficer')",ctx);assert.equal(vm.runInContext("getSigData('sigOfficer')",ctx),'');
+const pdf=vm.runInContext("buildPrintHtml({employeeName:'Employee',recordingOfficerName:'Officer'})",ctx);
+assert.equal((pdf.match(/class="pf-signature-space"/g)||[]).length,2);
+assert(pdf.includes('Employee')&&pdf.includes('Officer'));
+console.log('PASS: no on-screen canvases, two PDF signature spaces, historical signatures preserved.');

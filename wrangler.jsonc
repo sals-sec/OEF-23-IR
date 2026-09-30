@@ -1,0 +1,18 @@
+{
+  "name": "oef-23",
+  "compatibility_date": "2026-09-10",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": [
+      "/api/*"
+    ]
+  },
+  "main": "src/worker.mjs",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "oef-23-reports"
+    }
+  ]
+}

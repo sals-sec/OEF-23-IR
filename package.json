@@ -1,0 +1,18 @@
+{
+  "name": "sals-incident-statement",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.mjs",
+    "start": "node server.mjs",
+    "build": "node --check server.mjs",
+    "lint": "eslint . && node --check server.mjs && node --check public/report-pdf.js",
+    "format": "prettier --write .",
+    "test": "node tests/signatures.cjs && node tests/shared.mjs && node tests/pdf.cjs",
+    "deploy": "npx wrangler deploy"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}

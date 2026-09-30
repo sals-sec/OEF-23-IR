@@ -1,0 +1,6 @@
+{
+  "name": "OEF-23 Incident Statement Form",
+  "description": "Security incident statement and report registry management workspace with downloadable PDF generation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
