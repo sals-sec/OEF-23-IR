@@ -2,6 +2,8 @@
 
 Centralized incident statement reporting, registry management, and verification workspace designed for the SALS Security Team. Built to run seamlessly across both Cloudflare Workers (with Cloudflare D1 distributed storage) and standalone Node.js runtimes (with native SQLite).
 
+**Developed with Google AI Studio.**
+
 ---
 
 ## Key Features & Architecture
@@ -34,7 +36,8 @@ Centralized incident statement reporting, registry management, and verification 
   - Salted PBKDF2-SHA256 password hashing (100,000 iterations).
   - Secure session cookies (`__Host-oef_session`, `SameSite=None`, `Partitioned`, `Secure`, `HttpOnly`) with fallback Authorization Bearer header support for iframe environments.
   - Brute-force throttling per IP (maximum 20 failed login attempts per 15-minute sliding window).
-- **Initial Credentials:** First deployment initializes an administrative account with username `admin` and password `admin`.
+  - Security headers on all API responses (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`).
+- **Initial Credentials:** First deployment initializes an administrative account with username `admin` and password `admin`. The admin is forced to change this password on first login.
 - **User Account Backup & Restore:** Administrators can export and import user accounts via encrypted/hashed JSON backups.
 
 ### 5. Login Interface & Brand Presentation
@@ -45,6 +48,13 @@ Centralized incident statement reporting, registry management, and verification 
 - **Legal & Property Notice:** Official property statement centered beneath the login card:
   > *© 2026 SALS Security Team. All rights reserved.*  
   > *This is the property of SALS Security Team and may not be reproduced, distributed, or used without prior written authorization.*
+
+### 6. Compact, Modern UI
+- **Space-Efficient Design:** Reduced padding, margins, and font sizes throughout for maximum data density without sacrificing readability.
+- **Responsive Layout:** Adapts seamlessly from wide desktop monitors to mobile devices.
+- **Dark Mode:** Full dark theme support with a toggle in the account menu.
+- **Status Stepper:** Visual incident lifecycle tracker (Open → Under Investigation → Pending Police → Closed) with one-click status updates.
+- **Section Badges:** Real-time completion indicators for each form section as you type.
 
 ---
 
@@ -66,6 +76,7 @@ The application is configured as a Cloudflare Worker using Wrangler with static 
 The application includes a self-contained Node.js HTTP server:
 - **Server Entry Point:** `server.mjs` running on `PORT 3000` (`0.0.0.0`).
 - **Native SQLite:** Powered by Node.js built-in `node:sqlite` (`DatabaseSync`), adapting queries to match Cloudflare D1's Promise-based API.
+- **Graceful Shutdown:** Tracks in-flight requests and drains them on `SIGTERM`/`SIGINT` with a 30-second timeout.
 - **Development & Start Commands:**
   ```bash
   # Start local development server
@@ -81,9 +92,11 @@ The application includes a self-contained Node.js HTTP server:
 | Method | Route | Access | Description |
 |---|---|---|---|
 | `GET` | `/api/version` | Public | Returns build number, app version, and formatted display string. |
+| `GET` | `/api/health` | Public | Health check endpoint for uptime monitoring. Returns database connectivity status. |
 | `POST` | `/api/login` | Public | Authenticates credentials with rate-limiting; sets session token. |
 | `POST` | `/api/logout` | Authenticated | Revokes current session token server-side. |
 | `GET` | `/api/session` | Authenticated | Validates session token and returns active user profile. |
+| `POST` | `/api/change-password` | Authenticated | Changes the authenticated user's password. |
 | `GET` | `/api/reports` | Authenticated | Retrieves all reports sorted descending by report number. |
 | `POST` | `/api/reports` | Authenticated | Creates a new report record; assigns authenticated `preparedBy`. |
 | `PUT` | `/api/reports/:id` | Authenticated | Updates an existing report with optimistic concurrency validation. |
@@ -93,6 +106,17 @@ The application includes a self-contained Node.js HTTP server:
 | `POST` | `/api/users` | Admin only | Creates a new user account with specified role. |
 | `GET` | `/api/backup-users` | Admin only | Exports JSON credential backup of all users. |
 | `POST` | `/api/restore-users`| Admin only | Restores user accounts from a valid backup file. |
+
+---
+
+## Development & Tooling
+
+### Code Quality
+- **ESLint:** Linting with `eslint:recommended` rules. Run with `npm run lint`.
+- **Prettier:** Code formatting with single quotes, no semicolons, 120 char width. Run with `npm run format`.
+
+### CI/CD
+- **GitHub Actions:** Automated lint + test pipeline on every push and pull request to `main`.
 
 ---
 
