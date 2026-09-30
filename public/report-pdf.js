@@ -5,7 +5,7 @@ async function createReportPdf(report, logo){
   const pdf=await PDFDocument.create();
   const normal=await pdf.embedFont(StandardFonts.Helvetica);
   const bold=await pdf.embedFont(StandardFonts.HelveticaBold);
-  const W=595.28,H=841.89,M=36,CW=W-M*2,BOTTOM=H-40;
+  const W=595.28,H=841.89,M=36,CW=W-M*2;
   const ink=rgb(.12,.15,.19),muted=rgb(.38,.42,.47),border=rgb(.72,.75,.78),accent=rgb(.78,.18,.08);
   let page,y;
   let brand;if(logo)brand=await pdf.embedPng(logo);

@@ -14,7 +14,6 @@ async function passwordHash(password,salt){
 function equal(a,b){if(a.length!==b.length)return false;let diff=0;for(let i=0;i<a.length;i++)diff|=a.charCodeAt(i)^b.charCodeAt(i);return diff===0;}
 const securityHeaders={
   'X-Content-Type-Options':'nosniff',
-  'X-Frame-Options':'DENY',
   'Referrer-Policy':'strict-origin-when-cross-origin',
   'Permissions-Policy':'camera=(), microphone=(), geolocation=()',
 };
@@ -56,10 +55,10 @@ async function body(request){
 }
 export async function authRoute(request,DB,path,user){
   if(path==='/api/login' && request.method==='POST'){
-    const now=Date.now(),window=Math.floor(now/900000);
+    const now=Date.now(),window=Math.floor(now/loginWindowMs);
     const key=await digest((request.headers.get('CF-Connecting-IP')||'local')+':'+window);
     await DB.prepare('DELETE FROM login_limits WHERE expires_at<?').bind(now).run();
-    const limit=await DB.prepare('INSERT INTO login_limits (key,attempts,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET attempts=attempts+1 RETURNING attempts').bind(key,(window+1)*900000).first();
+    const limit=await DB.prepare('INSERT INTO login_limits (key,attempts,expires_at) VALUES (?,1,?) ON CONFLICT(key) DO UPDATE SET attempts=attempts+1 RETURNING attempts').bind(key,(window+1)*loginWindowMs).first();
     if(limit.attempts>maxLoginAttempts)return json({error:'Too many login attempts. Please try again in 15 minutes.'},429);
     let input;try{input=await body(request);}catch{return json({error:'Enter a valid user ID and password.'},400);}
     const username=String(input.username||'').trim().toLowerCase(),password=String(input.password||'');

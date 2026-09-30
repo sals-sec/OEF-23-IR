@@ -31,7 +31,7 @@ const ASSETS = {
     if (pathname === '/' || pathname === '') {
       pathname = '/index.html';
     }
-    const safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
+    const safePath = path.normalize(pathname).replace(/^(\.\.[/\\])+/, '');
     const filePath = path.join(PUBLIC_DIR, safePath);
 
     if (!filePath.startsWith(PUBLIC_DIR)) {
@@ -113,7 +113,6 @@ const env = {
 
 const securityHeaders = {
   'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };

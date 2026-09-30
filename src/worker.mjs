@@ -3,7 +3,6 @@ const fields = ['dateOfReport','timeOfReport','supervisor','employeeName','passp
 const schema = 'CREATE TABLE IF NOT EXISTS reports (id TEXT PRIMARY KEY, report_no TEXT NOT NULL UNIQUE, data TEXT NOT NULL, version INTEGER NOT NULL DEFAULT 1)';
 const securityHeaders={
   'X-Content-Type-Options':'nosniff',
-  'X-Frame-Options':'DENY',
   'Referrer-Policy':'strict-origin-when-cross-origin',
   'Permissions-Policy':'camera=(), microphone=(), geolocation=()',
 };
