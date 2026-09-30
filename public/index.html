@@ -729,7 +729,7 @@ function closePreview(){
 async function renderLivePdfPreview(){
   const pdfContainer = document.getElementById('previewPdfContainer');
   if(!pdfContainer || !currentPreviewData) return;
-  pdfContainer.innerHTML = '<div style="padding:40px;text-align:center;color:#fff;font-size:14px;">Generating live PDF preview…</div>';
+  pdfContainer.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text);font-size:14px;">Generating live PDF preview…</div>';
   try {
     await loadPdfTools();
     const logoSrc = document.querySelector('header .brand img')?.src || '';

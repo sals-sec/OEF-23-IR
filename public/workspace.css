@@ -65,6 +65,49 @@
     --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Light theme overrides */
+  [data-theme="light"] {
+    --bg: #f5f5f5;
+    --bg-elevated: #ffffff;
+    --card: #ffffff;
+    --card-hover: #f0f0f0;
+    --border: #d0d0d0;
+    --border-strong: #b0b0b0;
+
+    --text: #1a1a1a;
+    --text-muted: #555555;
+    --text-subtle: #888888;
+
+    --accent: #FF4D00;
+    --accent-hover: #e64400;
+    --accent-dim: rgba(255, 77, 0, 0.08);
+    --accent-glow: rgba(255, 77, 0, 0.15);
+
+    --danger: #d32f2f;
+    --warn: #f57c00;
+    --success: #2e7d32;
+
+    /* Status colors - light theme */
+    --status-open-bg: rgba(0, 122, 255, 0.1);
+    --status-open-text: #1565c0;
+    --status-open-border: rgba(0, 122, 255, 0.25);
+
+    --status-prog-bg: rgba(255, 184, 0, 0.1);
+    --status-prog-text: #e65100;
+    --status-prog-border: rgba(255, 184, 0, 0.25);
+
+    --status-closed-bg: rgba(0, 210, 106, 0.1);
+    --status-closed-text: #2e7d32;
+    --status-closed-border: rgba(0, 210, 106, 0.25);
+
+    /* Shadows - lighter for light theme */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --shadow-accent: 0 0 20px var(--accent-glow);
+  }
+
   /* --------------------------------------------------------------------------
      2. Global Baseline
      -------------------------------------------------------------------------- */
@@ -123,7 +166,7 @@
     right: 0;
     height: 60px;
     z-index: 50;
-    background: rgba(10, 10, 10, 0.95);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
@@ -279,7 +322,7 @@
     left: 0;
     width: 200px;
     padding: 16px 10px 12px;
-    background: rgba(10, 10, 10, 0.98);
+    background: color-mix(in srgb, var(--bg) 98%, transparent);
     border-right: 1px solid var(--border);
     display: flex;
     flex-direction: column;
@@ -803,7 +846,7 @@
     bottom: 0;
     left: 200px;
     right: 0;
-    background: rgba(10, 10, 10, 0.95);
+    background: color-mix(in srgb, var(--bg) 95%, transparent);
     backdrop-filter: blur(12px);
     border-top: 1px solid var(--border);
     padding: 8px 24px;
@@ -1208,7 +1251,7 @@
     border-color: var(--danger);
   }
   .preview-content {
-    background: #0a0a0a;
+    background: var(--bg);
     padding: 0;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
@@ -1265,7 +1308,7 @@
     position: fixed;
     inset: 0;
     z-index: 1000;
-    background: #0a0a0a;
+    background: var(--bg);
     background-image:
       radial-gradient(ellipse at 30% 20%, rgba(255, 77, 0, 0.12) 0%, transparent 50%),
       radial-gradient(ellipse at 70% 80%, rgba(255, 77, 0, 0.08) 0%, transparent 50%);
