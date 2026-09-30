@@ -35,7 +35,7 @@ Centralized incident statement reporting, registry management, and verification 
   - Secure session cookies (`__Host-oef_session`, `SameSite=None`, `Partitioned`, `Secure`, `HttpOnly`) with fallback Authorization Bearer header support for iframe environments.
   - Brute-force throttling per IP (maximum 20 failed login attempts per 15-minute sliding window).
   - Security headers on all API responses (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`).
-- **Initial Credentials:** First deployment initializes an administrative account with username `admin` and password `admin`. The admin is forced to change this password on first login.
+- **Initial Credentials:** First deployment initializes an administrative account with username `admin` and password `admin`.
 - **User Account Backup & Restore:** Administrators can export and import user accounts via encrypted/hashed JSON backups.
 
 ### 5. Login Interface & Brand Presentation
@@ -87,7 +87,6 @@ npm run dev
 | `POST` | `/api/login` | Public | Authenticates credentials with rate-limiting; sets session token. |
 | `POST` | `/api/logout` | Authenticated | Revokes current session token server-side. |
 | `GET` | `/api/session` | Authenticated | Validates session token and returns active user profile. |
-| `POST` | `/api/change-password` | Authenticated | Changes the authenticated user's password. |
 | `GET` | `/api/reports` | Authenticated | Retrieves all reports sorted descending by report number. |
 | `POST` | `/api/reports` | Authenticated | Creates a new report record; assigns authenticated `preparedBy`. |
 | `PUT` | `/api/reports/:id` | Authenticated | Updates an existing report with optimistic concurrency validation. |

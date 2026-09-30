@@ -32,21 +32,21 @@ export async function initAuth(DB){
   if(pending.has(DB))return pending.get(DB);
   const operation=(async()=>{
     for(const sql of [
-      "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, salt TEXT NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','user')), created_at TEXT NOT NULL, must_change_password INTEGER NOT NULL DEFAULT 0)",
+      "CREATE TABLE IF NOT EXISTS users (username TEXT PRIMARY KEY, salt TEXT NOT NULL, password_hash TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','user')), created_at TEXT NOT NULL)",
       'CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, username TEXT NOT NULL, expires_at INTEGER NOT NULL)',
       'CREATE TABLE IF NOT EXISTS login_limits (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, expires_at INTEGER NOT NULL)'
     ])await DB.prepare(sql).run();
     const existing=await DB.prepare('SELECT username FROM users LIMIT 1').first();
     if(!existing){
       const salt=random(),hash=await passwordHash('admin',salt);
-      await DB.prepare("INSERT OR IGNORE INTO users (username,salt,password_hash,role,created_at,must_change_password) VALUES (?,?,?,'admin',?,1)").bind('admin',salt,hash,new Date().toISOString()).run();
+      await DB.prepare("INSERT OR IGNORE INTO users (username,salt,password_hash,role,created_at) VALUES (?,?,?,'admin',?)").bind('admin',salt,hash,new Date().toISOString()).run();
     }
   })();pending.set(DB,operation);
   try{await operation;}catch(error){pending.delete(DB);throw error;}
 }
 export async function currentUser(request,DB){
   const token=tokenFrom(request);if(!/^[a-f0-9]{64}$/.test(token))return null;
-  return DB.prepare('SELECT users.username, users.role, users.must_change_password FROM sessions JOIN users ON sessions.username=users.username WHERE sessions.token_hash=? AND sessions.expires_at>?').bind(await digest(token),Date.now()).first();
+  return DB.prepare('SELECT users.username, users.role FROM sessions JOIN users ON sessions.username=users.username WHERE sessions.token_hash=? AND sessions.expires_at>?').bind(await digest(token),Date.now()).first();
 }
 async function body(request){
   if(!request.headers.get('Content-Type')?.includes('application/json'))throw Error('JSON is required.');
@@ -63,28 +63,19 @@ export async function authRoute(request,DB,path,user){
     let input;try{input=await body(request);}catch{return json({error:'Enter a valid user ID and password.'},400);}
     const username=String(input.username||'').trim().toLowerCase(),password=String(input.password||'');
     if(username.length>40||password.length>128)return json({error:'Incorrect user ID or password.'},401);
-    const account=await DB.prepare('SELECT username,salt,password_hash,role,must_change_password FROM users WHERE username=?').bind(username).first();
+    const account=await DB.prepare('SELECT username,salt,password_hash,role FROM users WHERE username=?').bind(username).first();
     const hash=await passwordHash(password,account?.salt||'not-a-user-dummy-salt');
     if(!account||!equal(hash,account.password_hash))return json({error:'Incorrect user ID or password.'},401);
     const token=random(),tokenHash=await digest(token);
     await DB.prepare('DELETE FROM sessions WHERE expires_at<?').bind(now).run();
     await DB.prepare('INSERT INTO sessions (token_hash,username,expires_at) VALUES (?,?,?)').bind(tokenHash,username,now+sessionTtlMs).run();
-    return json({user:{username:account.username,role:account.role,mustChangePassword:!!account.must_change_password},token},200,cookie(token,sessionTtlMs/1000));
+    return json({user:{username:account.username,role:account.role},token},200,cookie(token,sessionTtlMs/1000));
   }
   if(path==='/api/logout' && request.method==='POST'){
     const token=tokenFrom(request);if(token)await DB.prepare('DELETE FROM sessions WHERE token_hash=?').bind(await digest(token)).run();
     return json({loggedOut:true},200,cookie('',0));
   }
-  if(path==='/api/session' && request.method==='GET')return user?json({user:{username:user.username,role:user.role,mustChangePassword:!!user.must_change_password}}):json({error:'Please log in to continue.'},401);
-  if(path==='/api/change-password' && request.method==='POST'){
-    if(!user)return json({error:'Please log in to continue.'},401);
-    let input;try{input=await body(request);}catch{return json({error:'Invalid request.'},400);}
-    const newPassword=String(input.newPassword||'');
-    if(!newPassword||newPassword.length>128)return json({error:'Password must contain 1–128 characters.'},400);
-    const salt=random(),hash=await passwordHash(newPassword,salt);
-    await DB.prepare('UPDATE users SET salt=?,password_hash=?,must_change_password=0 WHERE username=?').bind(salt,hash,user.username).run();
-    return json({changed:true});
-  }
+  if(path==='/api/session' && request.method==='GET')return user?json({user}):json({error:'Please log in to continue.'},401);
   if(path==='/api/users/backup'){
     if(!user)return json({error:'Please log in to continue.'},401);
     if(user.role!=='admin')return json({error:'Only admin can backup users.'},403);
