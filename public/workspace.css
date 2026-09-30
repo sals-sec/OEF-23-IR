@@ -1381,6 +1381,32 @@
     border-color: var(--accent);
     box-shadow: 0 0 0 2px var(--accent-dim);
   }
+  .login-card .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .login-card .password-wrapper input {
+    width: 100%;
+    padding-right: 38px;
+  }
+  .login-card .btn-toggle-password {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition);
+  }
+  .login-card .btn-toggle-password:hover {
+    color: var(--text);
+  }
   .login-card .btn {
     width: 100%;
     min-height: 40px;
@@ -1426,6 +1452,9 @@
     line-height: 1.5;
     max-width: 400px;
     width: 100%;
+  }
+  .login-footer p {
+    margin: 0;
   }
 
   /* Toast */
